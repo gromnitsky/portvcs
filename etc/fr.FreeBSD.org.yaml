@@ -1,0 +1,7 @@
+--- 
+:host: anoncvs.fr.FreeBSD.org
+:port: 2401
+:user: anoncvs
+:pass: anoncvs
+:cvsroot: /home/ncvs
+:ports_tree: ports

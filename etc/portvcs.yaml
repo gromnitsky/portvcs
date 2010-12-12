@@ -1,0 +1,8 @@
+--- 
+:host: localhost
+:port: 2401
+:user: anonymous
+:pass: anoncvs
+:cvsroot: /usr/local/cvsroot
+:ports_tree: ''
+

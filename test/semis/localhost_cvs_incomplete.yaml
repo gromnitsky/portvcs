@@ -1,0 +1,7 @@
+--- 
+:host: 127.0.0.1
+:port: 
+:user: anonymous
+:pass: anoncvs
+:cvsroot: /usr/local/cvsroot
+:ports_tree: ''

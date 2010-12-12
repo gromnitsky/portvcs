@@ -1,0 +1,140 @@
+#!/usr/bin/env ruby
+# -*-ruby-*-
+
+require 'date'
+require 'optparse'
+require 'yaml'
+require 'shellwords.rb'
+
+require_relative '../lib/portvcs/portvcs.rb'
+require_relative '../lib/portvcs/utils.rb'
+
+include PortVCS
+
+$conf = {
+  verbose: 0,
+  banner: "Usage: #{File.basename($0)} [options] port",
+
+  vcs: 'cvs',
+  vcs_legal: ['cvs'], # TODO: get this array automatically
+  host: '',
+  port: 2401,
+  user: '',
+  cvsroot: '',
+  pass: '',
+  ports_tree: '',
+
+  date_cond: "#{(DateTime.now - 366).strftime('%d %b %Y')}<",
+
+  config: 'portvcs.yaml',
+  config_dirs: [File.absolute_path("#{File.dirname(File.expand_path($0))}/../etc"),
+                '/etc', '/usr/etc', '/usr/local/etc',
+               "#{Gem.dir}/gems/#{Meta::NAME}-#{Meta::VERSION}/etc"],
+
+  mode: 'log',
+  ports_tree_local: '/usr/ports'
+}
+
+def veputs(level, t)
+  puts(t) if $conf[:verbose] >= level
+end
+
+def errx(ec, t)
+  STDERR.puts File.basename($0) + ' error: ' + t.to_s
+  exit ec if ec > 0
+end
+
+def cl_parse(myargs, times = 1)
+  o = OptionParser.new()
+  o.banner = $conf[:banner]
+  o.on('-V', 'Show the program version') {
+    puts Meta::VERSION
+    exit 0
+  }
+  o.on('--cvs-pass-scramble STR', 'Handy encoding of CVS passwords') { |v|
+    puts CVSDumb.pass_scramble(v)
+    exit 0
+  }
+  o.on('--cvs-pass-descramble STR') { |v|
+    puts CVSDumb.pass_descramble(v)
+    exit 0
+  }
+  o.on('--config NAME', "Set a config name (default is #{$conf[:config]})") {|v|
+    $conf[:config] = v
+  }
+  o.on('--config-dirs', 'Show possible config locations') {
+    $conf[:config_dirs].each { |i|
+      f = i + '/' + $conf[:config]
+      puts (File.readable?(f) ? '* ' : '  ') +  f
+    }
+    exit 0
+  }
+  o.on('--ports-tree-local DIR') { |v| $conf[:ports_tree_local] = v }
+  o.on('-v', 'Be more verbose') {
+    # protect variable from incrementing in a second parse round
+    $conf[:verbose] += 1 if times <= 1
+  }
+  o.on('--host STR') { |v| $conf[:host] = v }
+  o.on('--port N', Integer, "(default is #{$conf[:port]})") { |v| $conf[:port] = v }
+  o.on('--user STR') { |v| $conf[:user] = v }
+  o.on('--pass STR') { |v| $conf[:pass] = v }
+  o.on('--ports-tree DIR') { |v| $conf[:ports_tree] = v }
+  o.on('--cvsroot DIR') { |v| $conf[:cvsroot] = v }
+  o.on('-d EXP', "Date condition, for example '1 Jan 2010<'") { |v| $conf[:date_cond] = v }
+  o.on('--vcs TYPE', $conf[:vcs_legal], "Select version control system (#{$conf[:vcs_legal].join(', ')})") { |v| $conf[:vcs] = v }
+  o.on('--vcs-version', 'Get version of a remote VCS server') { $conf[:mode] = 'version' }
+
+  begin
+    o.parse!(myargs)
+  rescue
+    errx(1, $!)
+  end
+end
+
+# --[ main ]------------------------------------------------------------
+
+# 1. parse env var
+if ENV.key?(Meta::NAME.upcase + '_CONF')
+  cl_parse ENV[Meta::NAME.upcase + '_CONF'].shellsplit
+end
+
+# 2. parse CL in case of --config option
+argv1 = ARGV.dup
+cl_parse argv1
+
+# 3. load config & final CL parse
+begin
+  r = Utils.config_load($conf, $conf[:config], $conf[:config_dirs])
+rescue
+  errx(1, "cannot load config: #{$!}")
+end
+veputs(1, "Loaded config: #{r}")
+cl_parse ARGV, 2
+
+abort($conf[:banner]) if (ARGV.size == 0 || ARGV[0] =~ /^\s*$/) && $conf[:mode] == 'log'
+
+# print our env
+if $conf[:verbose] >= 1
+  puts 'Libs dir: '+Utils.gem_libdir
+  pp $conf
+end
+
+# 4. connect to remote VCS
+v = VCS.new($conf[:vcs])
+begin
+v.open(debug: ($conf[:verbose] >= 2 ? true : false), host: $conf[:host], cvsroot: $conf[:cvsroot],
+       port: $conf[:port], user: $conf[:user], pass: $conf[:pass],
+       ports_tree: $conf[:ports_tree]) { |vp|
+  
+  case $conf[:mode]
+  when 'version'
+    puts vp.version
+  else
+    p = Utils.port_extract_name(ARGV[0].dup.strip, $conf[:ports_tree_local])
+    p[1] = 'Makefile' if !p[1]
+    vp.log(p[0], p[1], $conf[:date_cond]) {|i| puts i }
+  end
+}
+rescue
+  errx(1, $!)
+end

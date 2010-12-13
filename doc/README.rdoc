@@ -1,14 +1,106 @@
-login to my cvs:
+= Name
 
-  printf "BEGIN AUTH REQUEST\n/usr/local/cvsroot\nanonymous\nAy=0=h<Z\nEND AUTH REQUEST\n" | nc localhost 2401
-
-login to french cvs:
-
-  printf "BEGIN AUTH REQUEST\n/home/ncvs\nanoncvs\nAy=0=h<Z\nEND AUTH REQUEST\n" | nc anoncvs.fr.FreeBSD.org 2401
-
-log for Makefile of xoris port
-
-  printf "BEGIN AUTH REQUEST\n/home/ncvs\nanoncvs\nAy=0=h<Z\nEND AUTH REQUEST\nRoot /home/ncvs\nUseUnchanged\nDirectory .\n/home/ncvs/ports/graphics/xoris\nArgument Makefile\nlog\n" | nc anoncvs.fr.FreeBSD.org 2401
+portvcs--FreeBSD ports commits history viewer that doesn't require
+neither local ports tree nor CVS checkouts.
 
 
-printf "BEGIN AUTH REQUEST\n/usr/local/cvsroot\nanonymous\nAy=0=h<Z\nEND AUTH REQUEST\nRoot /usr/local/cvsroot\nDirectory .\n/usr/local/cvsroot/alex/pr2nntp\nArgument -N\nArgument -d\nArgument 1 Jan 2008<=1 Jan 2011\nArgument Makefile\nlog\n" | nc localhost 2401
+= Synopsis
+
+ portvcs [options] category/port
+
+
+= Description
+
+The portvcs utility connects to a remote VCS (Version Control System)
+server and grabs the log history of commits.
+
+At the time of writing, FreeBSD uses CVS (jeez) for its ports
+collection, so portvcs (with default configuration) connects to well
+known French CVS server via TCP port 2401 and reads the logs of a
+particular port name.  By default the utility constrains the log history
+to 1 year but it's easy changeable via +-d+ CL (command line) option.
+
+portvcs is not restricted to FreeBSD ports--it can read logs from
+(probably) any CVS server but in that case its usefulness is very
+doubtful.
+
+The options are as follows:
+
+\--ports-tree-local DIR::    Set this if you have ports tree
+                             directory in the unusual place.
+
+\--config-dirs::             List all possible locations for the
+                             configuration file. The first found wins.
+
+\--config NAME::             The name of the configuration file. If
+                             it contains +/+ in it, the list from
+                             <tt>\--config-dirs</tt> is ignored. Useful for
+                             testing.
+
+-d EXP::                     Passes the EXP to CVS server for
+                             limiting the logs. Usually it is
+                             something like '2 months ago<'. For
+                             possible values, read the help for the
+                             option +-d+ in cvs help for the log
+                             command, e.g, type:
+
+                              % info -n '(cvs)log options'
+
+\--host STR::                A hostname of a remote server.
+
+\--port N::                  A port number (default is 2401).
+
+\--user STR::                A user name on the remote server. 
+
+\--pass STR::                A password for the user on the remote
+                             server.
+
+\--cvsroot DIR::             CVSROOT on a remote server.
+
+\--ports-tree DIR::          A directory that follows CVSROOT and serves
+                             as a ports tree. For example, CVSROOT can
+                             be +/home/ncvs+ and the ports directory is
+                             +ports+ or may be empty at all.
+
+\--vcs-version::             Just get version of a remote VCS server and
+                             exit.
+
+\--cvs-pass-scramble STR::   A handy option for encrypting...
+\--cvs-pass-descramble STR:: ... and decrypting CVS passwords.
+
+-V::                         Show portvcs version and exit.
+
+-v::                         Be more verbose. You can supply it several
+                             times, viz. +-vv+ dumps even more debug info.
+
+= Configuration
+
+portvcs looks for its configuration at 3 places at start up.
+
+1. At <tt>PORTVCS_CONF</tt> env variable. (In format of it is exactly
+   similar to CL options.)
+
+2. At configuration file. The default name for it is
+   <tt>portvcs.yaml</tt> and its can be located in several system
+   directories which are observable by <tt>--config--dirs</tt> CL
+   option.
+
+3. At command line.
+
+The lower levels overrides the values from the higher levels.
+
+The configuration file must be in YAML format. Look into <tt>`gem env
+gemdir`/gems/portvcs-x.y.z/etc/<tt> directory for the examples.
+
+
+= Examples
+
+ % portvcs www/firefox
+ % portvcs /usr/ports/www/firefox
+ % portvcs www/firefox/files/patch-configure.in
+
+ % pwd
+ /usr/ports/x11-toolkits/gtk20
+ % portvcs Makefile
+ % portvcs files/patch-gtk_gtksignal.h
+ % portvcs -d '3 month ago<' .

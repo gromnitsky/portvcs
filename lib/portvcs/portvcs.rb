@@ -1,5 +1,6 @@
 require 'socket'
 
+# :include: ../../README.rdoc
 module PortVCS
   
   # A wrapper for *Dumb classes

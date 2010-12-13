@@ -13,7 +13,7 @@ include PortVCS
 
 $conf = {
   verbose: 0,
-  banner: "Usage: #{File.basename($0)} [options] port",
+  banner: "Usage: #{File.basename($0)} [options] category/port",
 
   vcs: 'cvs',
   vcs_legal: ['cvs'], # TODO: get this array automatically
@@ -69,7 +69,7 @@ def cl_parse(myargs, times = 1)
     }
     exit 0
   }
-  o.on('--ports-tree-local DIR') { |v| $conf[:ports_tree_local] = v }
+  o.on('--ports-tree-local DIR', "(Default is #{$conf[:ports_tree_local]})") { |v| $conf[:ports_tree_local] = v }
   o.on('-v', 'Be more verbose') {
     # protect variable from incrementing in a second parse round
     $conf[:verbose] += 1 if times <= 1
@@ -90,6 +90,18 @@ def cl_parse(myargs, times = 1)
     errx(1, $!)
   end
 end
+
+def pager_setup
+  [ENV['PAGER'], 'less', 'more'].compact.uniq.each {|i|
+    next unless Utils.in_path?(i.split.first)
+    io = IO.popen(i, "w") rescue next
+    next if $? and $?.exited? # pager didn't work
+    veputs(2, "Pager: #{i}")
+    return io
+  }
+  return nil
+end
+
 
 # --[ main ]------------------------------------------------------------
 
@@ -122,19 +134,31 @@ end
 # 4. connect to remote VCS
 v = VCS.new($conf[:vcs])
 begin
-v.open(debug: ($conf[:verbose] >= 2 ? true : false), host: $conf[:host], cvsroot: $conf[:cvsroot],
-       port: $conf[:port], user: $conf[:user], pass: $conf[:pass],
-       ports_tree: $conf[:ports_tree]) { |vp|
+  v.open(debug: ($conf[:verbose] >= 2 ? true : false), host: $conf[:host], cvsroot: $conf[:cvsroot],
+         port: $conf[:port], user: $conf[:user], pass: $conf[:pass],
+         ports_tree: $conf[:ports_tree]) { |vp|
   
-  case $conf[:mode]
-  when 'version'
-    puts vp.version
-  else
-    p = Utils.port_extract_name(ARGV[0].dup.strip, $conf[:ports_tree_local])
-    p[1] = 'Makefile' if !p[1]
-    vp.log(p[0], p[1], $conf[:date_cond]) {|i| puts i }
-  end
-}
+    case $conf[:mode]
+    when 'version'
+      puts vp.version
+    else
+      if !(p = Utils.port_extract_name(ARGV[0].dup.strip, $conf[:ports_tree_local]))
+        errx(1, "invalid port name")
+      end
+      p[1] = 'Makefile' if !p[1]
+
+      out = pager_setup() || STDOUT # get output stream
+      vp.log(p[0], p[1], $conf[:date_cond]) {|i|
+        begin
+          out.puts i
+        rescue Errno::EPIPE
+          out = STDOUT
+          retry
+        end
+      }
+      out.close unless out == STDOUT
+    end
+  }
 rescue
   errx(1, $!)
 end

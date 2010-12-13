@@ -75,6 +75,14 @@ module PortVCS
       t.each {|i| return i if File.readable?(i) }
       fail "both paths are invalid: #{t}"
     end
+
+    def self.in_path?(file)
+      return true if file =~ %r%\A/% and File.exist? file
+
+      ENV['PATH'].split(File::PATH_SEPARATOR).any? do |path|
+        File.exist? File.join(path, file)
+      end
+    end
     
   end # Utils
 end

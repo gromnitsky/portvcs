@@ -1,8 +1,2 @@
-- cl options:
-  + pass
-  + date
-  + host, user, etc
-  
-- pager
-+ global config
-+ tie to ports
++ pager
+- turn on gzip in cvs protocol

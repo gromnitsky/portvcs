@@ -9,7 +9,7 @@ require 'rake/testtask'
 spec = Gem::Specification.new() {|i|
   i.name = "portvcs"
   i.version = `bin/#{i.name} -V`
-  i.summary = "FreeBSD ports commits history viewer. Doesn't require neither local ports tree nor CVS checkouts."
+  i.summary = "FreeBSD ports commits history viewer that doesn't require neither local ports tree nor CVS checkouts."
   i.author = 'Alexander Gromnitsky'
   i.email = 'alexander.gromnitsky@gmail.com'
   i.homepage = "http://github.com/gromnitsky/#{i.name}"
@@ -25,7 +25,6 @@ spec = Gem::Specification.new() {|i|
   i.rdoc_options << '-m' << 'doc/README.rdoc'
   i.extra_rdoc_files = FileList['doc/*']
   
-#  i.add_dependency('activesupport', '>= 3.0.3')
   i.add_development_dependency('open4', '>=  1.0.1')
 }
 

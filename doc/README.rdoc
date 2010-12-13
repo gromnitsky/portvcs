@@ -1,54 +1,53 @@
-= Name
+=Name
 
 portvcs--FreeBSD ports commits history viewer that doesn't require
 neither local ports tree nor CVS checkouts.
 
 
-= Synopsis
+==Synopsis
 
  portvcs [options] category/port
 
 
-= Description
+==Description
 
 The portvcs utility connects to a remote VCS (Version Control System)
-server and grabs the log history of commits.
+server and grabs the history of commits.
 
-At the time of writing, FreeBSD uses CVS (jeez) for its ports
-collection, so portvcs (with default configuration) connects to well
-known French CVS server via TCP port 2401 and reads the logs of a
-particular port name.  By default the utility constrains the log history
-to 1 year but it's easy changeable via +-d+ CL (command line) option.
+At the time of writing FreeBSD uses CVS (jeez) for its ports collection,
+so portvcs (with default configuration) connects to well-known French
+CVS server via TCP port 2401 and reads the logs of a particular port.
+By default the utility constrains the history to 1 year but that's easy
+changeable via +-d+ CL (command line) option.
 
-portvcs is not restricted to FreeBSD ports--it can read logs from
+portvcs isn't restricted to FreeBSD ports--it can read logs from
 (probably) any CVS server but in that case its usefulness is very
 doubtful.
 
 The options are as follows:
 
-\--ports-tree-local DIR::    Set this if you have ports tree
-                             directory in the unusual place.
+\--ports-tree-local DIR::    Set this if you have the ports tree
+                             directory in an unusual place.
 
 \--config-dirs::             List all possible locations for the
                              configuration file. The first found wins.
 
 \--config NAME::             The name of the configuration file. If
                              it contains +/+ in it, the list from
-                             <tt>\--config-dirs</tt> is ignored. Useful for
-                             testing.
+                             <tt>\--config-dirs</tt> is ignored.
 
--d EXP::                     Passes the EXP to CVS server for
-                             limiting the logs. Usually it is
-                             something like '2 months ago<'. For
-                             possible values, read the help for the
-                             option +-d+ in cvs help for the log
-                             command, e.g, type:
+-d EXP::                     Passes the EXP to VCS server to set limits
+                             for the logs. Usually it's something like
+                             '2 months ago<'. For all possible values,
+                             read the help for the option +-d+ in cvs
+                             help for its log command, e.g, type:
 
                               % info -n '(cvs)log options'
 
 \--host STR::                A hostname of a remote server.
 
-\--port N::                  A port number (default is 2401).
+\--port N::                  A port number (default is 2401) of the
+                             remote server.
 
 \--user STR::                A user name on the remote server. 
 
@@ -59,8 +58,8 @@ The options are as follows:
 
 \--ports-tree DIR::          A directory that follows CVSROOT and serves
                              as a ports tree. For example, CVSROOT can
-                             be +/home/ncvs+ and the ports directory is
-                             +ports+ or may be empty at all.
+                             be +/home/ncvs+ and the ports directory can
+                             be +ports+ or may be empty at all.
 
 \--vcs-version::             Just get version of a remote VCS server and
                              exit.
@@ -73,27 +72,26 @@ The options are as follows:
 -v::                         Be more verbose. You can supply it several
                              times, viz. +-vv+ dumps even more debug info.
 
-= Configuration
+==Configuration
 
 portvcs looks for its configuration at 3 places at start up.
 
-1. At <tt>PORTVCS_CONF</tt> env variable. (In format of it is exactly
-   similar to CL options.)
+1. At <tt>PORTVCS_CONF</tt> env variable. (Its format is exactly similar
+   to CL options.)
 
-2. At configuration file. The default name for it is
-   <tt>portvcs.yaml</tt> and its can be located in several system
-   directories which are observable by <tt>--config--dirs</tt> CL
-   option.
+2. At configuration file. Its default name is <tt>portvcs.yaml</tt> and
+   it can be stored in several system directories which are observable
+   by <tt>--config--dirs</tt> CL option.
 
 3. At command line.
 
-The lower levels overrides the values from the higher levels.
+Higher number levels overrides the values from lower number levels.
 
 The configuration file must be in YAML format. Look into <tt>`gem env
-gemdir`/gems/portvcs-x.y.z/etc/<tt> directory for the examples.
+gemdir`/gems/portvcs-x.y.z/etc/<tt> directory for samples.
 
 
-= Examples
+==Examples
 
  % portvcs www/firefox
  % portvcs /usr/ports/www/firefox

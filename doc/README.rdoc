@@ -26,15 +26,15 @@ doubtful.
 
 The options are as follows:
 
-\--ports-tree-local DIR::    Set this if you have the ports tree
-                             directory in an unusual place.
+--ports-tree-local DIR::    Set this if you have the ports tree
+                            directory in an unusual place.
 
-\--config-dirs::             List all possible locations for the
-                             configuration file. The first found wins.
+--config-dirs::             List all possible locations for the
+                            configuration file. The first found wins.
 
-\--config NAME::             The name of the configuration file. If
-                             it contains +/+ in it, the list from
-                             <tt>\--config-dirs</tt> is ignored.
+--config NAME::             The name of the configuration file. If
+                            it contains +/+ in it, the list from
+                            <tt>\--config-dirs</tt> is ignored.
 
 -d EXP::                     Passes the EXP to VCS server to set limits
                              for the logs. Usually it's something like
@@ -44,28 +44,28 @@ The options are as follows:
 
                               % info -n '(cvs)log options'
 
-\--host STR::                A hostname of a remote server.
+--host STR::                A hostname of a remote server.
 
-\--port N::                  A port number (default is 2401) of the
-                             remote server.
+--port N::                  A port number (default is 2401) of the
+                            remote server.
 
-\--user STR::                A user name on the remote server. 
+--user STR::                A user name on the remote server. 
 
-\--pass STR::                A password for the user on the remote
-                             server.
+--pass STR::                A password for the user on the remote
+                            server.
 
-\--cvsroot DIR::             CVSROOT on a remote server.
+--cvsroot DIR::             CVSROOT on a remote server.
 
-\--ports-tree DIR::          A directory that follows CVSROOT and serves
-                             as a ports tree. For example, CVSROOT can
-                             be +/home/ncvs+ and the ports directory can
-                             be +ports+ or may be empty at all.
+--ports-tree DIR::          A directory that follows CVSROOT and serves
+                            as a ports tree. For example, CVSROOT can
+                            be +/home/ncvs+ and the ports directory can
+                            be +ports+ or may be empty at all.
 
-\--vcs-version::             Just get version of a remote VCS server and
-                             exit.
+--vcs-version::             Just get version of a remote VCS server and
+                            exit.
 
-\--cvs-pass-scramble STR::   A handy option for encrypting...
-\--cvs-pass-descramble STR:: ... and decrypting CVS passwords.
+--cvs-pass-scramble STR::   A handy option for encrypting...
+--cvs-pass-descramble STR:: ... and decrypting CVS passwords.
 
 -V::                         Show portvcs version and exit.
 
@@ -88,7 +88,7 @@ portvcs looks for its configuration at 3 places at start up.
 Higher number levels overrides the values from lower number levels.
 
 The configuration file must be in YAML format. Look into <tt>`gem env
-gemdir`/gems/portvcs-x.y.z/etc/<tt> directory for samples.
+gemdir`/gems/portvcs-x.y.z/etc/</tt> directory for samples.
 
 
 ==Examples

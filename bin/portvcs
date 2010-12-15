@@ -44,6 +44,10 @@ def errx(ec, t)
   exit ec if ec > 0
 end
 
+def warnx(t)
+  STDERR.puts File.basename($0) + ' warning: ' + t.to_s
+end
+
 def cl_parse(myargs, times = 1)
   o = OptionParser.new()
   o.banner = $conf[:banner]
@@ -133,6 +137,7 @@ end
 
 # 4. connect to remote VCS
 v = VCS.new($conf[:vcs])
+out = STDOUT
 begin
   v.open(debug: ($conf[:verbose] >= 2 ? true : false), host: $conf[:host], cvsroot: $conf[:cvsroot],
          port: $conf[:port], user: $conf[:user], pass: $conf[:pass],
@@ -147,18 +152,27 @@ begin
       end
       p[1] = 'Makefile' if !p[1]
 
+      try2retry = true
       out = pager_setup() || STDOUT # get output stream
       vp.log(p[0], p[1], $conf[:date_cond]) {|i|
         begin
           out.puts i
-        rescue Errno::EPIPE
+        rescue Errno::EPIPE # problem with pager
+          out.close unless out == STDOUT
           out = STDOUT
-          retry
+          if try2retry
+            try2retry = false
+            warnx('cannot popen with pager, retrying with stdout')
+            retry
+          else
+            raise
+          end
         end
       }
-      out.close unless out == STDOUT
     end
   }
 rescue
   errx(1, $!)
+ensure
+  out.close unless out == STDOUT
 end

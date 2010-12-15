@@ -18,7 +18,7 @@ At the time of writing FreeBSD uses CVS (jeez) for its ports collection,
 so portvcs (with default configuration) connects to well-known French
 CVS server via TCP port 2401 and reads the logs of a particular port.
 By default the utility constrains the history to 1 year but that's easy
-changeable via +-d+ CL (command line) option.
+changeable via <tt>-d</tt> CL (command line) option.
 
 portvcs isn't restricted to FreeBSD ports--it can read logs from
 (probably) any CVS server but in that case its usefulness is very
@@ -33,13 +33,13 @@ The options are as follows:
                             configuration file. The first found wins.
 
 --config NAME::             The name of the configuration file. If
-                            it contains +/+ in it, the list from
-                            <tt>\--config-dirs</tt> is ignored.
+                            it contains <tt>/</tt> in it, the list from
+                            <tt>--config-dirs</tt> is ignored.
 
 -d EXP::                     Passes the EXP to VCS server to set limits
                              for the logs. Usually it's something like
                              '2 months ago<'. For all possible values,
-                             read the help for the option +-d+ in cvs
+                             read the help for the option <tt>-d</tt> in cvs
                              help for its log command, e.g, type:
 
                               % info -n '(cvs)log options'
@@ -58,8 +58,9 @@ The options are as follows:
 
 --ports-tree DIR::          A directory that follows CVSROOT and serves
                             as a ports tree. For example, CVSROOT can
-                            be +/home/ncvs+ and the ports directory can
-                            be +ports+ or may be empty at all.
+                            be <tt>/home/ncvs</tt> and the ports
+                            directory can be <tt>ports</tt> or may be
+                            empty at all.
 
 --vcs-version::             Just get version of a remote VCS server and
                             exit.
@@ -70,7 +71,8 @@ The options are as follows:
 -V::                         Show portvcs version and exit.
 
 -v::                         Be more verbose. You can supply it several
-                             times, viz. +-vv+ dumps even more debug info.
+                             times, viz. <tt>-vv</tt> dumps even more
+                             debug info.
 
 ==Configuration
 
@@ -79,9 +81,9 @@ portvcs looks for its configuration at 3 places at start up.
 1. At <tt>PORTVCS_CONF</tt> env variable. (Its format is exactly similar
    to CL options.)
 
-2. At configuration file. Its default name is <tt>portvcs.yaml</tt> and
-   it can be stored in several system directories which are observable
-   by <tt>--config--dirs</tt> CL option.
+2. At the configuration file. Its default name is <tt>portvcs.yaml</tt>
+   and it can be stored in several system directories which are
+   observable by <tt>--config--dirs</tt> CL option.
 
 3. At command line.
 
@@ -90,6 +92,12 @@ Higher number levels overrides the values from lower number levels.
 The configuration file must be in YAML format. Look into <tt>`gem env
 gemdir`/gems/portvcs-x.y.z/etc/</tt> directory for samples.
 
+
+==Environment
+
+PAGER::           Output from the VCS server goes here.
+
+PORTVCS_CONF::    See Configuration.
 
 ==Examples
 

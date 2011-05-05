@@ -3,7 +3,6 @@
 
 require 'date'
 require 'optparse'
-require 'yaml'
 require 'shellwords.rb'
 
 require_relative '../lib/portvcs/portvcs.rb'

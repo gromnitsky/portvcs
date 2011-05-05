@@ -9,16 +9,17 @@ require 'rake/testtask'
 spec = Gem::Specification.new() {|i|
   i.name = "portvcs"
   i.version = `bin/#{i.name} -V`
-  i.summary = "FreeBSD ports commits history viewer that doesn't require neither local ports tree nor CVS checkouts."
+  i.summary = "FreeBSD ports commits history viewer that doesn't require neither local ports tree nor CVS checkouts"
+  i.description = i.summary + '.'
   i.author = 'Alexander Gromnitsky'
   i.email = 'alexander.gromnitsky@gmail.com'
   i.homepage = "http://github.com/gromnitsky/#{i.name}"
+  
   i.platform = Gem::Platform::RUBY
   i.required_ruby_version = '>= 1.9.2'
   i.files = FileList['lib/**/*', 'bin/*', 'doc/*', 'etc/*', '[A-Z]*', 'test/**/*']
 
   i.executables = FileList['bin/*'].gsub(/^bin\//, '')
-  i.default_executable = i.name
   
   i.test_files = FileList['test/test_*.rb']
   

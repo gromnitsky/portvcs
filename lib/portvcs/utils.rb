@@ -1,3 +1,4 @@
+require 'yaml'
 require 'pp'
 require_relative 'meta'
 
